@@ -35,6 +35,21 @@ navigator.mediaDevices.getUserMedia({
         connectToNewUser(userId, stream);
         console.log('connected User!!');
       })
+      let text = $("input");
+  // when press enter send message
+      $('html').keydown(function (e) {
+        if (e.which == 13 && text.val().length !== 0) {
+          console.log(text.val())
+          socket.emit('message', text.val());
+          text.val('')
+        }
+      });
+
+      socket.on('createMessage', message => {
+        console.log('create medsage ', message)
+        $("messages").append(`<li class="message"><b>user</b><br/>${message}</li>`);
+        scrollToBottom()
+      })
 }); 
 
 peer.on('open',id=>{
@@ -45,17 +60,17 @@ socket.on('user-disconnected', userId => {
   if (peers[userId]) peers[userId].close()
 })
 
-let connectToNewUser=(userId, stream)=>{
-    console.log('connected User!!1');
-    let call = peer.call(userId, stream)     /// sending my video to user
-    console.log('connected User!!2');
+function connectToNewUser(userId, stream) {
+    const call = peer.call(userId, stream)
     const video = document.createElement('video')
-    console.log('connected User!!3');
-    call.on('stream', userVideoStream => {   //recieving his stream and displaying on my browser
-        console.log('add video');
-        addVideoStream(video, userVideoStream)
-      })
-    console.log('connected User!!4');
+    call.on('stream', userVideoStream => {
+      addVideoStream(video, userVideoStream)
+    })
+    call.on('close', () => {
+      video.remove()
+    })
+
+    peers[userId] = call
 }
 function addVideoStream(video, stream) {
     video.srcObject = stream
@@ -65,21 +80,7 @@ function addVideoStream(video, stream) {
     videoGrid.append(video)
   }
 
-  let text = $("input");
-  // when press enter send message
-  $('html').keydown(function (e) {
-    if (e.which == 13 && text.val().length !== 0) {
-      console.log(text.val())
-      socket.emit('message', text.val());
-      text.val('')
-    }
-  });
-
-  socket.on('createMessage', message => {
-    console.log('create medsage ', message)
-    $("messages").append(`<li class="message"><b>user</b><br/>${message}</li>`);
-    scrollToBottom()
-  })
+  
 
   function scrollToBottom(){
     let d=$('.main_chat_window');
