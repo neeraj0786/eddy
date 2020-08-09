@@ -75,7 +75,7 @@ function addVideoStream(video, stream) {
     }
   });
 
-  socket.on("createMessage", message => {
+  socket.on('createMessage', message => {
     console.log('create medsage ', message)
     $("messages").append(`<li class="message"><b>user</b><br/>${message}</li>`);
     scrollToBottom()
