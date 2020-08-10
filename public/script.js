@@ -1,90 +1,82 @@
-const socket= io('/');
-const videoGrid=document.getElementById('video-grid');
-const peer =new Peer(undefined,{
-    path : '/peerjs',
-    host : '/',
-    port : '443'
-});
-const constraints = window.constraints = {
-    audio: true,
-    video: true
-  };
+const socket = io('/')
+const videoGrid = document.getElementById('video-grid')
+const myPeer = new Peer(undefined, {
+  path: '/peerjs',
+  host: '/',
+  port: '443'
+})
 let myVideoStream;
-const myVideo=document.createElement('video');
-myVideo.muted=true;
-const peers = {};
+const myVideo = document.createElement('video')
+myVideo.muted = true;
+const peers = {}
 navigator.mediaDevices.getUserMedia({
-   video :true,
-   audio :true
-}).then(stream =>{
-    myVideoStream=stream;
-    addVideoStream(myVideo,stream);
-    peer.on('call', call => {    // if recieved call then answering it
-        call.answer(stream)
-        console.log('answered!');
-        const video = document.createElement('video')
-        console.log('answered!2');
-        call.on('stream', userVideoStream => {
-            console.log('Adding Video');
-          addVideoStream(video, userVideoStream)
-        })
-        console.log('answered!3');
-      })
-    socket.on('user-connected', userId => {
-        console.log('Peer Connected!'+userId);
-        connectToNewUser(userId, stream);
-        console.log('connected User!!');
-      })
-      let text = $("input");
-  // when press enter send message
-      $('html').keydown(function (e) {
-        if (e.which == 13 && text.val().length !== 0) {
-          //console.log(text.val())
-          socket.emit('message', text.val());
-          text.val('')
-        }
-      });
-      socket.on('createMessage', message => {
-        $("ul").append(`<li class="message"><b>user</b><br/>${message}</li>`);
-        console.log('cm -->> ',message);
-        scrollToBottom()
-      })
-}); 
+  video: true,
+  audio: true
+}).then(stream => {
+  myVideoStream = stream;
+  addVideoStream(myVideo, stream)
+  myPeer.on('call', call => {
+    call.answer(stream)
+    const video = document.createElement('video')
+    call.on('stream', userVideoStream => {
+      addVideoStream(video, userVideoStream)
+    })
+  })
 
-peer.on('open',id=>{
-    socket.emit('join-room',ROOM_ID,id);  // sending to event listner io on index.js
+  socket.on('user-connected', userId => {
+    connectToNewUser(userId, stream)
+  })
+  // input value
+  let text = $("input");
+  // when press enter send message
+  $('html').keydown(function (e) {
+    if (e.which == 13 && text.val().length !== 0) {
+      socket.emit('message', text.val());
+      text.val('')
+    }
+  });
+  socket.on("createMessage", message => {
+    console.log('cm -->> ',message);
+    $("ul").append(`<li class="message"><b>user</b><br/>${message}</li>`);
+    scrollToBottom()
+  })
 })
 
 socket.on('user-disconnected', userId => {
   if (peers[userId]) peers[userId].close()
 })
 
+myPeer.on('open', id => {
+  socket.emit('join-room', ROOM_ID, id)
+})
+
 function connectToNewUser(userId, stream) {
-    const call = peer.call(userId, stream)
-    const video = document.createElement('video')
-    call.on('stream', userVideoStream => {
-      addVideoStream(video, userVideoStream)
-    })
-    call.on('close', () => {
-      video.remove()
-    })
+  const call = myPeer.call(userId, stream)
+  const video = document.createElement('video')
+  call.on('stream', userVideoStream => {
+    addVideoStream(video, userVideoStream)
+  })
+  call.on('close', () => {
+    video.remove()
+  })
 
-    peers[userId] = call
+  peers[userId] = call
 }
+
 function addVideoStream(video, stream) {
-    video.srcObject = stream
-    video.addEventListener('loadedmetadata', () => {
-      video.play()
-    })
-    videoGrid.append(video)
-  }
+  video.srcObject = stream
+  video.addEventListener('loadedmetadata', () => {
+    video.play()
+  })
+  videoGrid.append(video)
+}
 
-  
 
-  const scrollToBottom = () => {
-    var d = $('.main__chat_window');
-    d.scrollTop(d.prop("scrollHeight"));
-  }
+
+const scrollToBottom = () => {
+  var d = $('.main__chat_window');
+  d.scrollTop(d.prop("scrollHeight"));
+}
   function muteUnmute(){
     let enabled=myVideoStream.getAudioTracks()[0].enabled;
     if(enabled){
