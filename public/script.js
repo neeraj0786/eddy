@@ -3,7 +3,7 @@ const videoGrid=document.getElementById('video-grid');
 const myVideo=document.createElement('video');
 myVideo.muted=true;
 const peers = {};
-var peer =new Peer(undefined,{
+const peer =new Peer(undefined,{
     path : '/peerjs',
     host : '/',
     port : '443'
@@ -14,7 +14,7 @@ const constraints = window.constraints = {
   };
 let myVideoStream;
 navigator.mediaDevices.getUserMedia({
-  audio: true,
+    audio: true,
     video: true
 }).then(stream =>{
     myVideoStream=stream;
@@ -39,15 +39,14 @@ navigator.mediaDevices.getUserMedia({
   // when press enter send message
       $('html').keydown(function (e) {
         if (e.which == 13 && text.val().length !== 0) {
-          console.log(text.val())
+          //console.log(text.val())
           socket.emit('message', text.val());
           text.val('')
         }
       });
-
       socket.on('createMessage', message => {
-        console.log('create medsage ', message)
-        $("ul").append(`<li class="message"><b>user</b><br>${message}</li>`);
+        $("ul").append(`<li class="message"><b>user</b><br/>${message}</li>`);
+        console.log('cm -->> ',message);
         scrollToBottom()
       })
 }); 
@@ -82,8 +81,8 @@ function addVideoStream(video, stream) {
 
   
 
-  function scrollToBottom(){
-    let d=$('.main_chat_window');
+  const scrollToBottom = () => {
+    var d = $('.main__chat_window');
     d.scrollTop(d.prop("scrollHeight"));
   }
   function muteUnmute(){
