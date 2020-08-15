@@ -37,7 +37,8 @@ navigator.mediaDevices.getUserMedia({
   });
   socket.on("createMessage", message => {
     console.log('cm -->> ',message);
-    $("ul").append(`<li class="message"><b><%= userName %></b><br/>${message}</li>`);
+    let temp = userName;
+    $("ul").append(`<li class="message"><b>${temp}</b><br/>${message}</li>`);
     scrollToBottom()
   })
 })
@@ -136,7 +137,7 @@ const scrollToBottom = () => {
     userName = newname;
     console.log(newname);
     let namebox =document.getElementById("currentName");
-    namebox.innerHTML=`<h6 id ="currentName">Current User Name : <%= userName %></h6>`;
+    namebox.innerHTML=`<h6 id ="currentName">Current User Name : ${userName}</h6>`;
   }
 
   function ClipBoard(){
