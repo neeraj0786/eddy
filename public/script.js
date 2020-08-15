@@ -37,7 +37,7 @@ navigator.mediaDevices.getUserMedia({
   });
   socket.on("createMessage", message => {
     console.log('cm -->> ',message);
-    $("ul").append(`<li class="message"><b>user</b><br/>${message}</li>`);
+    $("ul").append(`<li class="message"><b><%= userName %></b><br/>${message}</li>`);
     scrollToBottom()
   })
 })
@@ -128,4 +128,23 @@ const scrollToBottom = () => {
     <span>Play Video</span>
     `
     document.querySelector('.main_play_Button').innerHTML = html;
+  }
+
+  function changeName()
+  {
+    let newname = document.getElementById("newName").value;
+    userName = newname;
+    console.log(newname);
+    let namebox =document.getElementById("currentName");
+    namebox.innerHTML=`<h6 id ="currentName">Current User Name : <%= userName %></h6>`;
+  }
+
+  function ClipBoard(){
+    let v = "https://eddy-meet.herokuapp.com/"+ROOM_ID;
+    console.log(v);
+    navigator.clipboard.writeText(v).then(function() {
+      console.log('Async: Copying to clipboard was successful!');
+    }, function(err) {
+      console.error('Async: Could not copy text: ', err);
+    });
   }

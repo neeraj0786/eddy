@@ -7,7 +7,7 @@ const peerServer = ExpressPeerServer(server, {
   debug: true
 });
 const { v4: uuidV4 } = require('uuid')
-
+const { uniqueNamesGenerator, starWars } = require('unique-names-generator');
 app.use('/peerjs', peerServer);
 
 app.set('view engine', 'ejs')
@@ -18,7 +18,8 @@ app.get('/', (req, res) => {
 })
 
 app.get('/:room', (req, res) => {
-  res.render('room', { roomId: req.params.room })
+  let userName = uniqueNamesGenerator({ dictionaries: [starWars] ,length :1});
+  res.render('room', { roomId: req.params.room ,userName});
 })
 
 io.on('connection', socket => {
